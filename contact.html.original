@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Parchilo Insights</title>
+  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --white: #ffffff;
+      --bg: #f4f5f7;
+      --border: #e2e8f0;
+      --border-dark: #2d3748;
+      --black: #0a0a0a;
+      --blue: #2563eb;
+      --blue-lt: #eff6ff;
+      --lime: #c8f135;
+      --lime-dark: #a8d020;
+      --green: #10b981;
+      --green-lt: #ecfdf5;
+      --amber: #f59e0b;
+      --amber-lt: #fef3c7;
+      --muted: #4a5568;
+      --dim: #718096;
+      --xdim: #a0aec0;
+      --shadow-sm: 0 1px 3px rgba(10, 10, 10, .05);
+      --shadow: 0 4px 16px rgba(10, 10, 10, .06);
+      --shadow-md: 0 8px 24px rgba(10, 10, 10, .08);
+      --shadow-lg: 0 20px 48px rgba(10, 10, 10, .1);
+      --shadow-nav: 0 2px 20px rgba(10, 10, 10, .08);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ═══════ NAV ═══════ */
+    .nav-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      padding: 8px 4vw;
+      pointer-events: none;
+    }
+
+    nav {
+      max-width: 500px;
+      margin: 0 auto;
+      height: 46px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px 0 16px;
+      box-shadow: var(--shadow-nav);
+      pointer-events: all;
+      transition: all .3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 30px rgba(10, 10, 10, .12);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-wordmark {
+      font-size: 16.5px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-invert {
+      background: var(--black);
+      color: var(--white);
+      padding: 1px 4px;
+      border-radius: 4px;
+      margin: 0 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 100px;
+      padding: 3px;
+    }
+
+    .nav-links li a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 5px 12px;
+      border-radius: 100px;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.active {
+      background: var(--white);
+      color: var(--black);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-open {
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--black);
+      background: var(--lime);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .15s;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-open:hover {
+      background: var(--lime-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Hamburger */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: all .25s;
+    }
+
+    .nav-hamburger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-hamburger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 66px;
+      left: 4vw;
+      right: 4vw;
+      z-index: 800;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow-lg);
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 12px 14px;
+      border-radius: 12px;
+      transition: all .15s;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg);
+      color: var(--black);
+    }
+
+    .mobile-menu-cta {
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .mobile-menu-cta .btn-open {
+      width: 100%;
+      padding: 13px;
+      font-size: 14px;
+      border-radius: 12px;
+      justify-content: center;
+    }
+
+    /* ═══════ CONTACT GRID LAYOUT ═══════ */
+    .contact-container {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 120px 4vw 60px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 48px;
+    }
+
+    .contact-form-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .contact-page-title {
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      margin-bottom: 8px;
+    }
+
+    .contact-page-desc {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .contact-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .contact-group label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .contact-group input,
+    .contact-group textarea {
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      outline: none;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+      background: var(--bg);
+    }
+
+    .contact-group input:focus,
+    .contact-group textarea:focus {
+      border-color: var(--black);
+      background: var(--white);
+      box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.04);
+    }
+
+    .btn-contact-submit {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-contact-submit:hover {
+      background: #222;
+    }
+
+    .form-success-banner {
+      display: none;
+      background: var(--green-lt);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: zoomIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* RIGHT COLUMN INFO CARDS */
+    .info-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .info-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .info-card-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .info-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--blue-lt);
+      color: var(--blue);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .info-item-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--dim);
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black);
+      word-break: break-word;
+    }
+
+    /* FAQ ACCORDION SECTION */
+    .faq-sect {
+      padding: 80px 4vw;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-title {
+      font-size: 28px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: -0.025em;
+    }
+
+    .accordion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .accordion-item.active {
+      border-color: var(--black);
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--black);
+      gap: 16px;
+      user-select: none;
+    }
+
+    .accordion-header:hover {
+      color: var(--blue);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 0 24px;
+    }
+
+    .accordion-item.active .accordion-content {
+      max-height: 200px;
+      padding-bottom: 20px;
+    }
+
+    .accordion-icon {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      color: var(--dim);
+    }
+
+    .accordion-item.active .accordion-icon {
+      transform: rotate(180deg);
+      color: var(--black);
+    }
+
+    /* Spinner Animation */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 1100;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #1e293b;
+      animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes toastSlideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .toast.show {
+      display: flex;
+    }
+
+    .toast i {
+      color: var(--lime);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open {
+      display: grid;
+    }
+
+    .modal-container {
+      background: var(--white);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      overflow: hidden;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dim);
+      display: grid;
+      place-items: center;
+      transition: color 0.15s;
+    }
+
+    .modal-close:hover {
+      color: var(--black);
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: 70vh;
+      overflow-y: auto;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    .modal-body h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black);
+      margin: 16px 0 6px;
+    }
+
+    .modal-body h4:first-child {
+      margin-top: 0;
+    }
+
+    .modal-body p {
+      margin-bottom: 12px;
+    }
+
+    .modal-footer-actions {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: #fafafa;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-modal-action {
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .btn-modal-action:hover {
+      border-color: var(--black);
+      color: var(--black);
+    }
+
+    .btn-modal-action.primary {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--black);
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 48px 4vw 26px;
+    }
+
+    .fg {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 32px;
+      max-width: 1340px;
+      margin: 0 auto;
+    }
+
+    .fd {
+      font-size: 12.5px;
+      color: var(--dim);
+      margin-top: 11px;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .fct {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 11px;
+    }
+
+    .fl {
+      list-style: none;
+    }
+
+    .fl li {
+      margin-bottom: 7px;
+    }
+
+    .fl a {
+      text-decoration: none;
+      font-size: 12.5px;
+      color: var(--dim);
+      transition: color .15s;
+    }
+
+    .fl a:hover {
+      color: var(--black);
+    }
+
+    .fb {
+      max-width: 1340px;
+      margin: 36px auto 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fbc {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .fbc span {
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .fbr {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .fchip {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    /* RESPONSIVE LAYOUTS */
+    @media (max-width: 1024px) {
+
+      .nav-links,
+      .btn-open {
+        display: none;
+      }
+
+      .nav-hamburger {
+        display: flex;
+      }
+
+      .fg {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .contact-container {
+        grid-template-columns: 1fr;
+        padding-top: 100px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .contact-form-wrap {
+        padding: 24px;
+      }
+
+      .mobile-menu {
+        top: 70px;
+        border-radius: 14px;
+      }
+
+      .fb {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ NAV ══ -->
+  <div class="nav-wrap">
+    <nav id="mainNav">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-wordmark">
+          <span>PAR</span><span class="logo-invert">CHI</span><span>LO</span>
+        </span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html"><i data-lucide="home" style="width:13px;height:13px"></i> Home</a></li>
+        <li><a href="blogs.html"><i data-lucide="book-open" style="width:13px;height:13px"></i> Blogs</a></li>
+        <li><a href="contact.html" class="active"><i data-lucide="mail" style="width:13px;height:13px"></i> Contact
+            Us</a></li>
+      </ul>
+
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html"><i data-lucide="home" style="width:16px;height:16px"></i> Home</a>
+    <a href="blogs.html"><i data-lucide="book-open" style="width:16px;height:16px"></i> Blogs</a>
+    <a href="contact.html" class="active"><i data-lucide="mail" style="width:16px;height:16px"></i> Contact Us</a>
+  </div>
+
+  <!-- ══ CONTACT CONTAINER ══ -->
+  <div class="contact-container">
+    <!-- Left Column: Form -->
+    <div class="contact-form-wrap">
+      <h1 class="contact-page-title">Get in Touch</h1>
+      <p class="contact-page-desc">Have a question or feedback? Fill out the form below and we will get back to you
+        shortly.</p>
+
+      <form class="contact-form" id="contactForm" onsubmit="handleContactSubmit(event)">
+        <div class="contact-group">
+          <label for="contactName">Full Name</label>
+          <input type="text" id="contactName" required placeholder="Enter your full name...">
+        </div>
+        <div class="contact-group">
+          <label for="contactEmail">Email Address</label>
+          <input type="email" id="contactEmail" required placeholder="Enter your business email...">
+        </div>
+        <div class="contact-group">
+          <label for="contactSubject">Subject</label>
+          <input type="text" id="contactSubject" required placeholder="How can we help you?">
+        </div>
+        <div class="contact-group">
+          <label for="contactMsg">Message</label>
+          <textarea id="contactMsg" rows="6" required placeholder="Write your message detail here..."></textarea>
+        </div>
+        <button type="submit" class="btn-contact-submit" id="contactSubmitBtn">
+          Send Message <i data-lucide="send" style="width: 14px; height: 14px;"></i>
+        </button>
+      </form>
+
+      <!-- Contact Form Success State -->
+      <div class="form-success-banner" id="contactSuccess">
+        <i data-lucide="check-circle" style="width: 48px; height: 48px; color: var(--green);"></i>
+        <h2>Message Received!</h2>
+        <p
+          style="font-weight: 500; font-size: 13.5px; color: var(--muted); margin-top: 8px; max-width: 400px; line-height: 1.5;">
+          Thank you for reaching out. We have logged your request and a member of the Nexaura Technologies team will
+          contact you within 24 business hours.
+        </p>
+      </div>
+    </div>
+
+    <!-- Right Column: Info Cards -->
+    <div class="info-column">
+      <div class="info-card">
+        <h2 class="info-card-title">Contact Channels</h2>
+
+        <div class="info-list">
+          <!-- Item 1: Email -->
+          <div class="info-item">
+            <div class="info-icon">
+              <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
+            </div>
+            <div class="info-item-content">
+              <span class="info-title">Email Us</span>
+              <span class="info-value">info@parchilo.com</span>
+              <span class="info-value"
+                style="font-size:12.5px; color:var(--dim); font-weight:400;">contact@nexauratechs.com</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Phone -->
+          <div class="info-item">
+            <div class="info-icon">
+              <i data-lucide="phone" style="width: 18px; height: 18px;"></i>
+            </div>
+            <div class="info-item-content">
+              <span class="info-title">Call Us</span>
+              <span class="info-value">+44 20 7123 4567</span>
+              <span class="info-value" style="font-size:12.5px; color:var(--dim); font-weight:400;">Mon - Fri, 9AM - 6PM
+                GMT</span>
+            </div>
+          </div>
+
+          <!-- Item 3: Address -->
+          <div class="info-item">
+            <div class="info-icon">
+              <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
+            </div>
+            <div class="info-item-content">
+              <span class="info-title">Visit Us</span>
+              <span class="info-value">18-21 Northumberland Ave, London WC2N 5EA, United Kingdom</span>
+              <span class="info-value" style="font-size:13px; color:var(--muted); font-weight:400;">London,
+                United Kingdom</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Info Card -->
+      <div class="info-card" style="background:#0f172a; color:var(--white); border-color:#1e293b;">
+        <h2 class="info-card-title" style="color:var(--white)">Nexaura Corporate</h2>
+        <p style="font-size: 13.5px; color: var(--xdim); line-height: 1.6; margin-bottom: 16px;">
+          Parchilo is an insights brand operated by Nexaura Technologies. We provide software engineering consultancy,
+          cloud migrations, and digital compliance consulting globally.
+        </p>
+        <a href="https://nexauratechs.com" target="_blank" class="btn-open"
+          style="width:100%; justify-content:center; border-radius:8px;">
+          Visit Nexaura Corporate <i data-lucide="external-link"
+            style="width: 14px; height: 14px; margin-left: 6px;"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FAQ SECTION ══ -->
+  <section class="faq-sect">
+    <div class="faq-inner">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+
+      <div class="accordion-list">
+        <!-- Item 1 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>What is Parchilo Insights?</span>
+            <i data-lucide="chevron-down" class="accordion-icon" style="width: 18px; height: 18px;"></i>
+          </div>
+          <div class="accordion-content">
+            <p>Parchilo Insights is a technology publication created and curated by Nexaura Technologies. We specialize
+              in bringing senior developers, UI/UX designers, and software engineers deep-dive articles, architectural
+              patterns, and updates about the modern web, focusing especially on AI implementation and data compliance.
+            </p>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Can I use your code snippets in my projects?</span>
+            <i data-lucide="chevron-down" class="accordion-icon" style="width: 18px; height: 18px;"></i>
+          </div>
+          <div class="accordion-content">
+            <p>Absolutely! All code blocks, SVG graphic configurations, and helper scripts published on our pages are
+              released under the open-source MIT License. You are free to integrate them, modify them, and use them for
+              personal, educational, or commercial production projects.</p>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>How often are new articles published?</span>
+            <i data-lucide="chevron-down" class="accordion-icon" style="width: 18px; height: 18px;"></i>
+          </div>
+          <div class="accordion-content">
+            <p>We publish new content weekly, typically every Tuesday and Thursday. Our team conducts architectural
+              analysis on real-world scenarios (like FBR tax integrations, local offline databases, or SVG
+              visualizations) to provide fully tested developer tutorials.</p>
+          </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>How can I consult with Nexaura Technologies?</span>
+            <i data-lucide="chevron-down" class="accordion-icon" style="width: 18px; height: 18px;"></i>
+          </div>
+          <div class="accordion-content">
+            <p>If your enterprise is looking for tailored software consultancy, database architectures, or security
+              reviews, you can fill out the contact form above with a brief overview of your project, or email us
+              directly at partner@nexauratechs.com.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastMessage">
+    <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+    <span id="toastText">Success!</span>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="fg">
+      <div>
+        <span class="logo-wordmark" style="font-size:16px">
+          <span>PAR</span><span class="logo-invert">CHI</span><span>LO</span>
+        </span>
+        <p class="fd">
+          Premium development blog and engineering insights platform, powered by Nexaura Technologies.
+        </p>
+      </div>
+      <div>
+        <div class="fct">Navigation</div>
+        <ul class="fl">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fct">Legal Documents</div>
+        <ul class="fl">
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb">
+      <div class="fbc">© 2026 <span>Parchilo</span>. All rights reserved. Built by Nexaura.</div>
+      <div class="fbr">
+        <span class="fchip">SSL Secured</span>
+        <span class="fchip">v4.0 (Insights Hub)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════ JAVASCRIPT LOGIC ═══════ -->
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Nav shadow on scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Mobile Hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+      }
+    });
+
+    // FAQ Accordion Handler
+    function toggleAccordion(element) {
+      const item = element.parentElement;
+      const isActive = item.classList.contains('active');
+
+      // Close all open items first
+      document.querySelectorAll('.accordion-item').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    }
+
+    // Contact Form Submission Handler
+    function handleContactSubmit(e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('contactSubmitBtn');
+      const contactForm = document.getElementById('contactForm');
+      const successBanner = document.getElementById('contactSuccess');
+
+      // Change button state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<div class="spinner" style="border-top-color: var(--white); width: 14px; height: 14px;"></div> Sending Message...`;
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Send Message <i data-lucide="send" style="width: 14px; height: 14px;"></i>`;
+        lucide.createIcons();
+
+        // Toggle form and banner
+        contactForm.style.display = 'none';
+        successBanner.style.display = 'flex';
+
+        showToast("Message sent successfully!");
+
+        // Reset form inputs after 5s and bring back the form
+        setTimeout(() => {
+          contactForm.reset();
+          contactForm.style.display = 'flex';
+          successBanner.style.display = 'none';
+        }, 5000);
+
+      }, 1500);
+    }
+
+    // Helper for toast popup message
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      const text = document.getElementById('toastText');
+
+      text.innerText = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms &amp; Conditions — Parchilo</title>
+  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --white: #ffffff;
+      --bg: #f4f5f7;
+      --border: #e2e8f0;
+      --border-dark: #2d3748;
+      --black: #0a0a0a;
+      --blue: #2563eb;
+      --blue-lt: #eff6ff;
+      --lime: #c8f135;
+      --lime-dark: #a8d020;
+      --green: #10b981;
+      --green-lt: #ecfdf5;
+      --amber: #f59e0b;
+      --amber-lt: #fef3c7;
+      --muted: #4a5568;
+      --dim: #718096;
+      --xdim: #a0aec0;
+      --shadow-sm: 0 1px 3px rgba(10, 10, 10, .05);
+      --shadow: 0 4px 16px rgba(10, 10, 10, .06);
+      --shadow-md: 0 8px 24px rgba(10, 10, 10, .08);
+      --shadow-lg: 0 20px 48px rgba(10, 10, 10, .1);
+      --shadow-nav: 0 2px 20px rgba(10, 10, 10, .08);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ═══════ NAV ═══════ */
+    .nav-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      padding: 8px 4vw;
+      pointer-events: none;
+    }
+
+    nav {
+      max-width: 500px;
+      margin: 0 auto;
+      height: 46px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px 0 16px;
+      box-shadow: var(--shadow-nav);
+      pointer-events: all;
+      transition: all .3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 30px rgba(10, 10, 10, .12);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-wordmark {
+      font-size: 16.5px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-invert {
+      background: var(--black);
+      color: var(--white);
+      padding: 1px 4px;
+      border-radius: 4px;
+      margin: 0 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 100px;
+      padding: 3px;
+    }
+
+    .nav-links li a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 5px 12px;
+      border-radius: 100px;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.active {
+      background: var(--white);
+      color: var(--black);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Hamburger */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: all .25s;
+    }
+
+    .nav-hamburger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-hamburger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 66px;
+      left: 4vw;
+      right: 4vw;
+      z-index: 800;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow-lg);
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 12px 14px;
+      border-radius: 12px;
+      transition: all .15s;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg);
+      color: var(--black);
+    }
+
+    /* ═══════ LEGAL CONTAINER ═══════ */
+    .legal-container {
+      max-width: 800px;
+      margin: 110px auto 60px;
+      padding: 0 4vw;
+    }
+
+    .legal-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 640px) {
+      .legal-card {
+        padding: 28px 20px;
+      }
+    }
+
+    .legal-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 28px;
+    }
+
+    .legal-title {
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .legal-date {
+      font-size: 13px;
+      color: var(--dim);
+      font-weight: 500;
+    }
+
+    .legal-body {
+      font-size: 14.5px;
+      color: #2d3748;
+    }
+
+    .legal-body h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--black);
+      margin: 28px 0 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .legal-body p {
+      margin-bottom: 16px;
+    }
+
+    .legal-body ul {
+      margin-bottom: 16px;
+      padding-left: 20px;
+    }
+
+    .legal-body li {
+      margin-bottom: 6px;
+    }
+
+    /* ═══════ FOOTER ═══════ */
+    footer {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 48px 4vw 26px;
+    }
+
+    .fg {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 32px;
+      max-width: 1340px;
+      margin: 0 auto;
+    }
+
+    .fd {
+      font-size: 12.5px;
+      color: var(--dim);
+      margin-top: 11px;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .fct {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 11px;
+    }
+
+    .fl {
+      list-style: none;
+    }
+
+    .fl li {
+      margin-bottom: 7px;
+    }
+
+    .fl a {
+      text-decoration: none;
+      font-size: 12.5px;
+      color: var(--dim);
+      transition: color .15s;
+    }
+
+    .fl a:hover {
+      color: var(--black);
+    }
+
+    .fb {
+      max-width: 1340px;
+      margin: 36px auto 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fbc {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .fbc span {
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .fbr {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .fchip {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    /* RESPONSIVE LAYOUT */
+    @media (max-width: 1024px) {
+      .nav-links, .nav-cta {
+        display: none;
+      }
+
+      .nav-hamburger {
+        display: flex;
+      }
+
+      .fg {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .legal-container {
+        margin-top: 90px;
+      }
+
+      .mobile-menu {
+        top: 70px;
+        border-radius: 14px;
+      }
+
+      .fb {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ NAV ══ -->
+  <div class="nav-wrap">
+    <nav id="mainNav">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-wordmark">
+          <span>PAR</span><span class="logo-invert">CHI</span><span>LO</span>
+        </span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html"><i data-lucide="home" style="width:13px;height:13px"></i> Home</a></li>
+        <li><a href="blogs.html"><i data-lucide="book-open" style="width:13px;height:13px"></i> Blogs</a></li>
+        <li><a href="contact.html"><i data-lucide="mail" style="width:13px;height:13px"></i> Contact Us</a></li>
+      </ul>
+
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html"><i data-lucide="home" style="width:16px;height:16px"></i> Home</a>
+    <a href="blogs.html"><i data-lucide="book-open" style="width:16px;height:16px"></i> Blogs</a>
+    <a href="contact.html"><i data-lucide="mail" style="width:16px;height:16px"></i> Contact Us</a>
+  </div>
+
+  <!-- ══ TERMS CONTENT ══ -->
+  <div class="legal-container">
+    <div class="legal-card">
+      <div class="legal-header">
+        <h1 class="legal-title">Terms &amp; Conditions</h1>
+        <span class="legal-date">Last Updated: July 8, 2026</span>
+      </div>
+
+      <div class="legal-body">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing, browsing, or using the Parchilo invoice management tool and insights blog platform, you agree to be bound by these Terms and Conditions and all applicable laws and regulations. If you do not agree to these terms, you are prohibited from using or accessing this site.</p>
+
+        <h3>2. Client-side Processing &amp; Data Storage</h3>
+        <p>Parchilo processes and stores invoice documents entirely on your local device using browser Storage arrays (such as LocalStorage and IndexedDB). You acknowledge and agree that:</p>
+        <ul>
+          <li>We do not store your invoices on external database servers.</li>
+          <li>Clearing your browser cache, storage database, or utilizing private browsing modes (Incognito) will permanently delete your invoices.</li>
+          <li>You are solely responsible for printing or saving your invoices as PDFs to back up your billing records.</li>
+        </ul>
+
+        <h3>3. Intellectual Property Rights</h3>
+        <p>All tech articles, illustrations, mockups, custom SVG graphics, and textual assets published on Parchilo are the intellectual property of Nexaura Technologies, unless noted otherwise. However, to foster learning and developer support:</p>
+        <ul>
+          <li>Any code snippets, formulas, or configurations shared inside blog articles are licensed under the MIT License and may be used in personal or commercial projects.</li>
+          <li>Redistribution or republishing of complete tech articles or design layouts without explicit consent is strictly prohibited.</li>
+        </ul>
+
+        <h3>4. Use License</h3>
+        <p>Permission is granted to temporarily utilize the interactive invoice builder on Parchilo's website for personal or commercial billing generation. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+        <ul>
+          <li>Modify or copy the core web platform source code.</li>
+          <li>Attempt to decompile or reverse engineer any scripts running on the platform.</li>
+          <li>Use the tool or its design to launch a competing online invoice simulation service.</li>
+        </ul>
+
+        <h3>5. Disclaimer of Liability</h3>
+        <p>The materials, calculators, and parser simulations on Parchilo's website are provided on an 'as is' basis. Nexaura Technologies makes no warranties, expressed or implied, and hereby disclaims all other warranties including, without limitation, implied warranties of merchantability, fitness for a particular purpose, or non-infringement of intellectual property.</p>
+        <p>Further, Nexaura Technologies does not warrant or make any representations concerning the accuracy, likely results, or reliability of the use of invoice layouts for official tax filings (such as FBR compliance audits).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="fg">
+      <div>
+        <span class="logo-wordmark" style="font-size:16px">
+          <span>PAR</span><span class="logo-invert">CHI</span><span>LO</span>
+        </span>
+        <p class="fd">
+          Premium development blog and engineering insights platform, powered by Nexaura Technologies.
+        </p>
+      </div>
+      <div>
+        <div class="fct">Navigation</div>
+        <ul class="fl">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fct">Legal Documents</div>
+        <ul class="fl">
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb">
+      <div class="fbc">© 2026 <span>Parchilo</span>. All rights reserved. Built by Nexaura.</div>
+      <div class="fbr">
+        <span class="fchip">SSL Secured</span>
+        <span class="fchip">v4.5 (Insights Hub)</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Nav shadow on scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Mobile Hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insights — Parchilo</title>
+  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="config.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --white: #ffffff;
+      --bg: #f4f5f7;
+      --border: #e2e8f0;
+      --border-dark: #2d3748;
+      --black: #0a0a0a;
+      --blue: #2563eb;
+      --blue-lt: #eff6ff;
+      --lime: #c8f135;
+      --lime-dark: #a8d020;
+      --green: #10b981;
+      --green-lt: #ecfdf5;
+      --amber: #f59e0b;
+      --amber-lt: #fef3c7;
+      --muted: #4a5568;
+      --dim: #718096;
+      --xdim: #a0aec0;
+      --shadow-sm: 0 1px 3px rgba(10, 10, 10, .05);
+      --shadow: 0 4px 16px rgba(10, 10, 10, .06);
+      --shadow-md: 0 8px 24px rgba(10, 10, 10, .08);
+      --shadow-lg: 0 20px 48px rgba(10, 10, 10, .1);
+      --shadow-nav: 0 2px 20px rgba(10, 10, 10, .08);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ═══════ NAV & PROGRESS BAR ═══════ */
+    .nav-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      padding: 8px 4vw;
+      pointer-events: none;
+    }
+
+    nav {
+      max-width: 500px;
+      margin: 0 auto;
+      height: 46px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px 0 16px;
+      box-shadow: var(--shadow-nav);
+      pointer-events: all;
+      transition: all .3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 30px rgba(10, 10, 10, .12);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-wordmark {
+      font-size: 16.5px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-invert {
+      background: var(--black);
+      color: var(--white);
+      padding: 1px 4px;
+      border-radius: 4px;
+      margin: 0 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 100px;
+      padding: 3px;
+    }
+
+    .nav-links li a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 5px 12px;
+      border-radius: 100px;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.active {
+      background: var(--white);
+      color: var(--black);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-open {
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--black);
+      background: var(--lime);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .15s;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-open:hover {
+      background: var(--lime-dark);
+      transform: translateY(-1px);
+    }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: all .25s;
+    }
+
+    .nav-hamburger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-hamburger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 66px;
+      left: 4vw;
+      right: 4vw;
+      z-index: 800;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow-lg);
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 12px 14px;
+      border-radius: 12px;
+      transition: all .15s;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg);
+      color: var(--black);
+    }
+
+    .mobile-menu-cta {
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .mobile-menu-cta .btn-open {
+      width: 100%;
+      padding: 13px;
+      font-size: 14px;
+      border-radius: 12px;
+      justify-content: center;
+    }
+
+    /* Reading Progress Bar */
+    .progress-bar-container {
+      position: fixed;
+      top: 68px; /* below nav */
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      z-index: 910;
+    }
+
+    @media (max-width: 640px) {
+      .progress-bar-container {
+        top: 60px;
+      }
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--blue);
+      transition: width 0.1s ease-out;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* ═══════ ARTICLE LAYOUT ═══════ */
+    .article-wrap {
+      max-width: 900px;
+      margin: 110px auto 40px;
+      padding: 0 4vw;
+    }
+
+    .article-container {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 640px) {
+      .article-container {
+        padding: 24px 16px;
+      }
+    }
+
+    .article-header {
+      margin-bottom: 28px;
+    }
+
+    .article-category {
+      display: inline-block;
+      background: var(--blue-lt);
+      color: var(--blue);
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-size: clamp(24px, 3.8vw, 42px);
+      font-weight: 900;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+
+    .article-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+
+    .author-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--black);
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .author-meta-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .author-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .publish-date {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .share-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-share {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.15s;
+    }
+
+    .btn-share:hover {
+      border-color: var(--black);
+      color: var(--black);
+      background: var(--bg);
+    }
+
+    /* Cover SVG */
+    .article-cover {
+      width: 100%;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 640px) {
+      .article-cover {
+        height: 200px;
+      }
+    }
+
+    /* Content Typography */
+    .article-body {
+      font-size: 16px;
+      color: #2d3748;
+      line-height: 1.8;
+    }
+
+    .article-body p {
+      margin-bottom: 20px;
+    }
+
+    .article-body h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--black);
+      margin: 36px 0 16px;
+      letter-spacing: -0.02em;
+      border-left: 4px solid var(--lime);
+      padding-left: 12px;
+    }
+
+    .article-body blockquote {
+      border-left: 4px solid var(--blue);
+      padding: 10px 20px;
+      background: var(--bg);
+      border-radius: 0 12px 12px 0;
+      font-style: italic;
+      color: var(--muted);
+      margin: 24px 0;
+      font-size: 16.5px;
+    }
+
+    .article-body code {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 700;
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14.5px;
+      color: var(--blue);
+    }
+
+    .article-body pre {
+      background: #0f172a;
+      color: var(--white);
+      padding: 18px 24px;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin: 24px 0;
+      border: 1px solid #1e293b;
+    }
+
+    .article-body pre code {
+      background: transparent;
+      padding: 0;
+      color: #e2e8f0;
+      font-weight: 400;
+      font-size: 13.5px;
+    }
+
+    /* 404 Block */
+    .not-found-block {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .not-found-block i {
+      color: var(--xdim);
+      margin-bottom: 16px;
+    }
+
+    .not-found-block h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .not-found-block p {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* Related posts */
+    .related-sect {
+      max-width: 900px;
+      margin: 40px auto 80px;
+      padding: 0 4vw;
+    }
+
+    .related-title {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .related-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .related-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+      border-color: #cbd5e1;
+    }
+
+    .related-card-category {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--blue);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .related-card-title {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.4;
+      color: var(--black);
+      margin-bottom: 12px;
+    }
+
+    .related-card-date {
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 1100;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #1e293b;
+      animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes toastSlideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .toast.show {
+      display: flex;
+    }
+
+    .toast i {
+      color: var(--lime);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open {
+      display: grid;
+    }
+
+    .modal-container {
+      background: var(--white);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+      animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dim);
+      display: grid;
+      place-items: center;
+      transition: color 0.15s;
+    }
+
+    .modal-close:hover {
+      color: var(--black);
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: 70vh;
+      overflow-y: auto;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    .modal-footer-actions {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: #fafafa;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-modal-action {
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .btn-modal-action:hover {
+      border-color: var(--black);
+      color: var(--black);
+    }
+
+    .btn-modal-action.primary {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--black);
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 48px 4vw 26px;
+    }
+
+    .fg {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 32px;
+      max-width: 1340px;
+      margin: 0 auto;
+    }
+
+    .fd {
+      font-size: 12.5px;
+      color: var(--dim);
+      margin-top: 11px;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .fct {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 11px;
+    }
+
+    .fl {
+      list-style: none;
+    }
+
+    .fl li {
+      margin-bottom: 7px;
+    }
+
+    .fl a {
+      text-decoration: none;
+      font-size: 12.5px;
+      color: var(--dim);
+      transition: color .15s;
+    }
+
+    .fl a:hover {
+      color: var(--black);
+    }
+
+    .fb {
+      max-width: 1340px;
+      margin: 36px auto 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fbc {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .fbc span {
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .fbr {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .fchip {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    /* RESPONSIVE LAYOUT */
+    @media (max-width: 1024px) {
+      .nav-links, .btn-open {
+        display: none;
+      }
+
+      .nav-hamburger {
+        display: flex;
+      }
+
+      .fg {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .mobile-menu {
+        top: 70px;
+        border-radius: 14px;
+      }
+
+      .fb {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ NAV ══ -->
+  <div class="nav-wrap">
+    <nav id="mainNav">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-wordmark">
+          <span>PAR</span><span class="logo-invert">CHI</span><span>LO</span>
+        </span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html"><i data-lucide="home" style="width:13px;height:13px"></i> Home</a></li>
+        <li><a href="blogs.html" class="active"><i data-lucide="book-open" style="width:13px;height:13px"></i> Blogs</a></li>
+        <li><a href="contact.html"><i data-lucide="mail" style="width:13px;height:13px"></i> Contact Us</a></li>
+      </ul>
+
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html"><i data-lucide="home" style="width:16px;height:16px"></i> Home</a>
+    <a href="blogs.html" class="active"><i data-lucide="book-open" style="width:16px;height:16px"></i> Blogs</a>
+    <a href="contact.html"><i data-lucide="mail" style="width:16px;height:16px"></i> Contact Us</a>
+  </div>
+
+  <!-- Reading Progress Bar Container -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="readingProgress"></div>
+  </div>
+
+  <!-- ══ ARTICLE CONTENT WRAP ══ -->
+  <div class="article-wrap">
+    <!-- Active Article Block -->
+    <article class="article-container" id="activeArticleBox">
+      <div class="article-header">
+        <span class="article-category" id="artCategory">Category</span>
+        <h1 class="article-title" id="artTitle">Title</h1>
+        
+        <div class="article-meta">
+          <div class="author-block">
+            <div class="author-avatar" id="artAvatar" style="background:#0a0a0a; color:#fff">SJ</div>
+            <div class="author-meta-text">
+              <span class="author-name" id="artAuthor">Author Name</span>
+              <span class="publish-date" id="artDate">July 8, 2026</span>
+            </div>
+          </div>
+
+          <div class="share-row">
+            <button class="btn-share" onclick="copyArticleLink()" title="Copy Link"><i data-lucide="link" style="width:14px; height:14px"></i></button>
+            <button class="btn-share" onclick="shareTwitter()" title="Share on Twitter"><i data-lucide="twitter" style="width:14px; height:14px"></i></button>
+            <button class="btn-share" onclick="shareLinkedIn()" title="Share on LinkedIn"><i data-lucide="linkedin" style="width:14px; height:14px"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Covered Artwork Graphic -->
+      <div class="article-cover" id="artCover">
+        <!-- SVG injected dynamically -->
+      </div>
+
+      <!-- Body text content -->
+      <div class="article-body" id="artBody">
+        <!-- Injected dynamically -->
+      </div>
+    </article>
+
+    <!-- Error Block (If post ID not found) -->
+    <div class="not-found-block" id="notFoundBox">
+      <i data-lucide="alert-triangle" style="width: 64px; height: 64px;"></i>
+      <h2>Article Not Found</h2>
+      <p>The tech article you are searching for does not exist or has been relocated.</p>
+      <a href="blogs.html" class="btn-open">Back to Blogs List</a>
+    </div>
+  </div>
+
+  <!-- ══ RELATED ARTICLES SECT ══ -->
+  <section class="related-sect" id="relatedBox">
+    <h3 class="related-title">Related Insights</h3>
+    <div class="related-grid" id="relatedGrid">
+      <!-- Dynamic renders -->
+    </div>
+  </section>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastMessage">
+    <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+    <span id="toastText">Link copied to clipboard!</span>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="fg">
+      <div>
+        <span class="logo-wordmark" style="font-size:16px">
+          <span>PAR</span><span class="logo-invert">CHI</span><span>LO</span>
+        </span>
+        <p class="fd">
+          Premium development blog and engineering insights platform, powered by Nexaura Technologies.
+        </p>
+      </div>
+      <div>
+        <div class="fct">Navigation</div>
+        <ul class="fl">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fct">Legal Documents</div>
+        <ul class="fl">
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb">
+      <div class="fbc">© 2026 <span>Parchilo</span>. All rights reserved. Built by Nexaura.</div>
+      <div class="fbr">
+        <span class="fchip">SSL Secured</span>
+        <span class="fchip">v4.0 (Insights Hub)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════ JAVASCRIPT LOGIC ═══════ -->
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Nav shadow on scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Scroll reading progress indicator
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      document.getElementById('readingProgress').style.width = scrolled + '%';
+    });
+
+    // Mobile Hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+      }
+    });
+
+    // Modal helpers
+    function openModal(modalId, event) {
+      if (event) event.preventDefault();
+      document.getElementById(modalId).classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('open');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Initialize Supabase Client
+    let supabaseClient = null;
+    if (typeof supabase !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY) {
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    const seedPosts = {
+      "ai-trends": {
+        title: "The Evolution of Client-Side AI in Modern Web Applications",
+        category: "AI & Technology",
+        date: "July 8, 2026",
+        readTime: "6 min read",
+        author: "Sarah Jenkins",
+        avatar: "SJ",
+        avatarBg: "#c8f135",
+        avatarColor: "#0a0a0a",
+        svg: `<svg width="100%" height="100%" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#0b1120;">
+                <circle cx="200" cy="120" r="100" stroke="#c8f135" stroke-width="1" stroke-dasharray="4 8" opacity="0.3"/>
+                <circle cx="200" cy="120" r="60" stroke="#c8f135" stroke-width="2" opacity="0.5"/>
+                <circle cx="200" cy="120" r="20" fill="#c8f135" opacity="0.8"/>
+                <path d="M50 40 L350 200" stroke="#c8f135" stroke-width="1" stroke-dasharray="5 5" opacity="0.2"/>
+              </svg>`,
+        body: `
+          <p>For years, running complex machine learning tasks meant sending user data back to hefty GPU servers, incurring latency penalties, high infrastructure costs, and data leakage concerns. Today, a paradigm shift is underway. Running inference directly inside the browser sandbox is finally practical.</p>
+          
+          <h2>Why Client-Side AI?</h2>
+          <p>Local execution solves three core bottlenecks: latency, bandwidth cost, and privacy. When code runs client-side, it eliminates the roundtrip to a remote server. Interactions become instantaneous, unlocking fluid UI flows like real-time text analysis or live object detection on high-refresh-rate webcams.</p>
+          <blockquote>"By executing machine learning models directly on the client, web apps can operate fully offline while maintaining absolute compliance with privacy acts like GDPR and HIPAA."</blockquote>
+          
+          <h2>Technological Pillars: WASM, WebGPU &amp; WebGL</h2>
+          <p>This revolution is fueled by browser hardware acceleration. WebAssembly (Wasm) provides near-native execution speed for traditional CPU operations. Simultaneously, WebGL and the new WebGPU standard allow Javascript to tap directly into client graphics hardware, enabling highly parallelized tensor calculations.</p>
+          <p>For instance, standard models compiled for web runtimes (such as ONNX models or TensorFlow.js instances) can query physical cores directly. Here is a simple demonstration of importing and executing an ONNX runtime session locally in browser memory:</p>
+          
+          <pre><code>// Importing client-side ONNX Web Runtime
+import * as ort from 'onnxruntime-web';
+
+async function runLocalInference(inputData) {
+  // Load local pre-compiled model file
+  const session = await ort.InferenceSession.create('./ai_model.onnx');
+  
+  // Package input tensors
+  const inputTensor = new ort.Tensor('float32', inputData, [1, 10]);
+  const feeds = { input: inputTensor };
+  
+  // Execute and read predictions instantly
+  const results = await session.run(feeds);
+  console.log("Prediction finished client-side:", results.output.data);
+}</code></pre>
+          
+          <h2>Absolute Privacy by Design</h2>
+          <p>Because files are parsed and evaluated inside the local browser context, no database tables on cloud servers store private credentials. A user can drag a bank statement or purchase ledger image directly into a container, extract layout grids, compile totals, and close the tab without a single byte escaping their machine. This is secure user-experience design at its peak.</p>
+        `
+      },
+      "local-storage": {
+        title: "Leveraging Local Browser Storage for Offline Web Apps",
+        category: "Development",
+        date: "July 7, 2026",
+        readTime: "5 min read",
+        author: "Marcus Evans",
+        avatar: "ME",
+        avatarBg: "#2563eb",
+        avatarColor: "#ffffff",
+        svg: `<svg width="100%" height="100%" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#131b2e;">
+                <rect x="50" y="40" width="300" height="160" rx="8" stroke="#334155" stroke-width="2"/>
+                <line x1="50" y1="80" x2="350" y2="80" stroke="#334155" stroke-width="2"/>
+                <circle cx="80" cy="60" r="5" fill="#ef4444"/>
+                <circle cx="100" cy="60" r="5" fill="#f59e0b"/>
+                <circle cx="120" cy="60" r="5" fill="#10b981"/>
+                <path d="M100 110 L150 160 M150 110 L100 160" stroke="#c8f135" stroke-width="3" stroke-linecap="round"/>
+              </svg>`,
+        body: `
+          <p>Modern applications are expected to work under any network condition. If a user enters a tunnel or boards a plane, the application should not freeze. Designing for offline-first is no longer a luxury; it is a core feature of engineering solid web solutions.</p>
+
+          <h2>The Hierarchy of Browser Storage</h2>
+          <p>To store state locally, browsers provide several storage vectors. Knowing when to use what is crucial:</p>
+          <ul>
+            <li><strong>LocalStorage:</strong> Synchronous, string-only key-value storage. Best used for light preference settings (like UI theme modes) under 5MB.</li>
+            <li><strong>IndexedDB:</strong> Asynchronous, transactional object-store database. Excellent for handling large structured records, indices, and blob media binary files.</li>
+            <li><strong>Cache API:</strong> Specifically designed to cache HTTP request-response pairs, facilitating instant assets loading via Service Workers.</li>
+          </ul>
+
+          <h2>IndexedDB vs. LocalStorage</h2>
+          <p>Because LocalStorage blocks the main browser execution thread, accessing large datasets there will degrade user interactions. IndexedDB runs fully asynchronously, allowing developers to query, index, and process large amounts of user-facing data without dropping screen frames.</p>
+          <p>Leveraging wrapper libraries like Dexie.js makes IndexedDB interaction clean and declarative:</p>
+          
+          <pre><code>// Initializing an IndexedDB object table schema
+const db = new Dexie('ParchiloOfflineDB');
+db.version(1).stores({
+  articles: 'id, title, category, date',
+  syncQueue: '++id, action, payload'
+});
+
+// Adding a record asynchronously without blocking UI threads
+await db.articles.add({
+  id: 'local-storage',
+  title: 'Leveraging Local Browser Storage',
+  category: 'Development',
+  date: '2026-07-07'
+});</code></pre>
+
+          <h2>Offline-First Syncing Pipelines</h2>
+          <p>When connection is restored, synchronization queues read offline actions and push them to primary servers. Using background sync registers ensures updates complete even if the user exits the browser tab immediately after connection returns.</p>
+        `
+      },
+      "micro-animations": {
+        title: "Designing Micro-Animations for Delightful Interfaces",
+        category: "Design & UX",
+        date: "July 5, 2026",
+        readTime: "4 min read",
+        author: "Anya Lopez",
+        avatar: "AL",
+        avatarBg: "#ec4899",
+        avatarColor: "#ffffff",
+        svg: `<svg width="100%" height="100%" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#1a102f;">
+                <path d="M50 180 Q120 40, 200 140 T350 80" stroke="#c8f135" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <circle cx="200" cy="140" r="8" fill="#2563eb"/>
+                <circle cx="300" cy="100" r="8" fill="#10b981"/>
+              </svg>`,
+        body: `
+          <p>Static screens are boring. When elements snap instantly without context, the human visual cortex has to work harder to register what changed. Micro-animations bridge this cognitive gap by making UI elements feel tactile and alive.</p>
+
+          <h2>Timing Curves: Linear vs. Cubic Bezier</h2>
+          <p>Natural objects do not start moving at peak speed and stop instantly. They accelerate and decelerate. Therefore, linear animations feel rigid and robotic. Modern web designs use cubic-bezier timing curves to emulate organic friction and inertia.</p>
+          <blockquote>Using custom curves like <code>cubic-bezier(0.34, 1.56, 0.64, 1)</code> gives elements a slight bouncing spring effect on arrival, making interactions feel energetic and premium.</blockquote>
+
+          <h2>GPU-Accelerated Compositing</h2>
+          <p>Animating properties like <code>width</code>, <code>height</code>, <code>top</code>, or <code>margin</code> forces the browser to recalculate layouts and repaint the screen on every frame, causing stutter. To achieve fluid 60FPS animations, restrict transitions to hardware-accelerated properties: <code>transform</code> (for movement, scaling, and rotation) and <code>opacity</code>.</p>
+          
+          <pre><code>/* Optimized Hover animation using CSS GPU transform */
+.interactive-btn {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              background-color 0.15s ease;
+  will-change: transform;
+}
+
+.interactive-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+}</code></pre>
+
+          <h2>Micro-Interactions for Action Validation</h2>
+          <p>From a subtle checkmark scaling up when a transaction succeeds, to a loading bar tracking progress, micro-animations validate user inputs instantly. They guide user attention and turn functional pages into premium digital experiences.</p>
+        `
+      },
+      "fbr-compliance": {
+        title: "Understanding FBR Compliance in Fintech Integrations",
+        category: "Workflows",
+        date: "July 3, 2026",
+        readTime: "8 min read",
+        author: "Hamza Riaz",
+        avatar: "HR",
+        avatarBg: "#10b981",
+        avatarColor: "#ffffff",
+        svg: `<svg width="100%" height="100%" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#091e16;">
+                <rect x="80" y="40" width="240" height="160" rx="6" stroke="#10b981" stroke-width="2" fill="none"/>
+                <path d="M120 80 H280 M120 120 H280 M120 160 H200" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="270" cy="160" r="18" fill="#c8f135"/>
+              </svg>`,
+        body: `
+          <p>Integrating invoicing platforms with regional tax databases is one of the most critical stages in financial technology development. In Pakistan, real-time POS verification by the Federal Board of Revenue (FBR) is legally mandated for retail and transactional web platforms.</p>
+
+          <h2>Financial Logging and Signatures</h2>
+          <p>Every transaction invoice generated must carry a secure validation hash. FBR validation requires integrating with their Web API endpoints, submitting structured JSON data including sales values, tax rates, customer identifiers, and shop NTNs.</p>
+          <p>Upon verification, the FBR system returns a unique invoice number and QR code data, which must be printed on the invoice copy in real-time. High security must be maintained using public key signature headers (HMAC) to prevent tampering.</p>
+
+          <h2>Idempotency Keys in API Calls</h2>
+          <p>Fintech connections can fail mid-transit due to local network fluctuation. If an API request to report an invoice times out, retrying blindly could result in double tax entries. To solve this, developers must use unique Idempotency Keys on all outgoing API calls:</p>
+
+          <pre><code>// Sending a secure verification post request to the FBR server
+async function verifyInvoiceWithFBR(invoiceData) {
+  const response = await fetch('https://api.fbr.gov.pk/pos/realtime', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Idempotency-Key': `invoice_${invoiceData.id}`,
+      'Authorization': `Bearer ${process.env.FBR_API_TOKEN}`
+    },
+    body: JSON.stringify(invoiceData)
+  });
+  
+  return await response.json();
+}</code></pre>
+
+          <h2>Building Resilient Error Retry Queues</h2>
+          <p>When the FBR servers are temporarily offline, transactions should not fail. Implement a local retry database (using client-side storage or server-side Redis queues) with exponential backoff algorithms to retry failed submissions once connections are re-established.</p>
+        `
+      },
+      "css-architecture": {
+        title: "Modern CSS Architectures: Beyond Utility Frameworks",
+        category: "Development",
+        date: "June 28, 2026",
+        readTime: "7 min read",
+        author: "Marcus Evans",
+        avatar: "ME",
+        avatarBg: "#2563eb",
+        avatarColor: "#ffffff",
+        svg: `<svg width="100%" height="100%" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#13282f;">
+                <rect x="70" y="40" width="260" height="160" rx="8" stroke="#00f2fe" stroke-width="2" fill="none"/>
+                <line x1="60" y1="80" x2="340" y2="80" stroke="#00f2fe" stroke-width="2"/>
+                <rect x="250" y="120" width="60" height="40" rx="4" fill="#00f2fe" opacity="0.3"/>
+              </svg>`,
+        body: `
+          <p>Utility-first CSS frameworks like Tailwind CSS solved the "stylesheet bloat" problem by mapping styling directly to utility classes. However, they brought their own challenges: hard-to-maintain HTML files, loss of semantic layout structure, and coupling of markup to a specific framework. Modern vanilla CSS is reclaiming the throne.</p>
+
+          <h2>CSS Variables as State Engines</h2>
+          <p>CSS Custom Properties (Variables) are not static constants; they are dynamic, inheritable values that can be manipulated in real-time. They can represent layout states, interactive themes, or user configurations:</p>
+          <pre><code>:root {
+  --primary-color: #2563eb;
+  --card-padding: 24px;
+}
+
+/* Dynamically adjust variables in container blocks */
+.dark-section {
+  --primary-color: #c8f135;
+  --card-padding: 32px;
+  background-color: #0f172a;
+}</code></pre>
+
+          <h2>Native Nesting &amp; Modern Syntax</h2>
+          <p>With native nesting supported across all modern browsers, the main argument for CSS preprocessors like Sass has vanished. You can now write clean, nested selector structures directly in your browser stylesheets:</p>
+          <pre><code>nav {
+  display: flex;
+  background: var(--white);
+  
+  .nav-logo {
+    font-weight: 800;
+  }
+  
+  .nav-links {
+    list-style: none;
+    
+    li a {
+      text-decoration: none;
+      color: var(--muted);
+      
+      &:hover {
+        color: var(--black);
+      }
+    }
+  }
+}</code></pre>
+
+          <h2>The Container Query Revolution</h2>
+          <p>For a decade, responsive design was driven by viewport media queries. Today, Container Queries allow components to adjust their styling based on the size of their parent element rather than the screen size, facilitating truly modular, self-contained layout designs.</p>
+        `
+      },
+      "prompt-engineering": {
+        title: "Prompt Engineering for Developer Workflows",
+        category: "AI & Technology",
+        date: "June 25, 2026",
+        readTime: "6 min read",
+        author: "Sarah Jenkins",
+        avatar: "SJ",
+        avatarBg: "#c8f135",
+        avatarColor: "#0a0a0a",
+        svg: `<svg width="100%" height="100%" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#111827;">
+                <circle cx="200" cy="120" r="50" fill="#374151" opacity="0.5"/>
+                <path d="M140 120 Q200 60, 260 120 T360 120" stroke="#3b82f6" stroke-width="2" fill="none"/>
+              </svg>`,
+        body: `
+          <p>Prompt engineering is often treated as an art form of testing random instructions. However, when building production automation tooling using LLMs, prompt design must be treated as a software engineering discipline: structured, version-controlled, and thoroughly tested.</p>
+
+          <h2>Structured Prompt Schemas</h2>
+          <p>Just like writing a function signature, prompts must separate instructions, constraints, context, and variables clearly. Standardize prompt structures inside your codebase using templating formats (like Markdown or JSON configurations) to enforce system expectations.</p>
+          <blockquote>"Using clear, nested Markdown tags like <code># Instructions</code> and <code># Constraints</code> prevents the model from hallucinating or losing track of context."</blockquote>
+
+          <h2>Few-Shot Examples &amp; Formatting Constraints</h2>
+          <p>The most robust way to enforce specific outputs (like valid JSON objects or structured code files) is few-shot prompting: providing the model with concrete input/output examples inside the prompt. Enforcing schemas via output formats (such as JSON schema parameters) in API calls guarantees reliable parsing down the line.</p>
+          <pre><code># Task: Parse git commit messages and summarize changes
+# Output Format: Valid JSON array containing objects with keys "scope" and "summary"
+
+# Examples:
+Input: "fix(nav): corrected alignment on scroll"
+Output: [{"scope": "nav", "summary": "corrected alignment on scroll"}]
+
+Input: "feat(auth): integrated OAuth verification API"
+Output: [{"scope": "auth", "summary": "integrated OAuth verification API"}]</code></pre>
+
+          <h2>Automated Prompt Testing</h2>
+          <p>As models update, prompt performance can drift. Developers should write integration tests using model evaluations (assertions testing key properties in mock runs) as part of CI/CD loops to guarantee quality checks on automated code reviews.</p>
+        `
+      }
+    };
+
+    let blogPosts = {};
+
+    // Load active article based on URL search query
+    let currentPostId = "";
+    function loadArticle() {
+      const params = new URLSearchParams(window.location.search);
+      const postId = params.get('id') || 'ai-trends'; // default to ai-trends if missing
+      currentPostId = postId;
+
+      const post = blogPosts[postId];
+      const articleBox = document.getElementById('activeArticleBox');
+      const notFoundBox = document.getElementById('notFoundBox');
+      const relatedBox = document.getElementById('relatedBox');
+
+      if (!post) {
+        // Show 404, hide content
+        articleBox.style.display = 'none';
+        relatedBox.style.display = 'none';
+        notFoundBox.style.display = 'block';
+        return;
+      }
+
+      // Populate content
+      articleBox.style.display = 'block';
+      relatedBox.style.display = 'block';
+      notFoundBox.style.display = 'none';
+
+      document.getElementById('artCategory').innerText = post.category;
+      document.getElementById('artTitle').innerText = post.title;
+      document.title = `${post.title} — Parchilo Insights`;
+      
+      const avatar = document.getElementById('artAvatar');
+      avatar.innerText = post.avatar;
+      avatar.style.background = post.avatarBg || '#000';
+      avatar.style.color = post.avatarColor || '#fff';
+
+      document.getElementById('artAuthor').innerText = post.author;
+      document.getElementById('artDate').innerText = post.date;
+      document.getElementById('artCover').innerHTML = post.svg;
+      document.getElementById('artBody').innerHTML = post.body;
+
+      // Render Related list
+      renderRelatedPosts(postId);
+    }
+
+    // Render Related posts list
+    function renderRelatedPosts(activeId) {
+      const container = document.getElementById('relatedGrid');
+      container.innerHTML = '';
+
+      // Get keys of all articles excluding current active ID
+      const keys = Object.keys(blogPosts).filter(key => key !== activeId);
+      
+      // Select two related posts
+      const selectedKeys = keys.slice(0, 2);
+
+      selectedKeys.forEach(key => {
+        const item = blogPosts[key];
+        const card = document.createElement('a');
+        card.href = `blog-post.html?id=${key}`;
+        card.className = 'related-card';
+        card.innerHTML = `
+          <div>
+            <span class="related-card-category">${item.category}</span>
+            <h4 class="related-card-title">${escapeHtml(item.title)}</h4>
+          </div>
+          <span class="related-card-date">${item.date}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Share controls
+    function copyArticleLink() {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast("Link copied to clipboard!");
+      }).catch(err => {
+        showToast("Failed to copy link.");
+      });
+    }
+
+    function shareTwitter() {
+      const title = document.getElementById('artTitle').innerText;
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(`Check out this insightful article on Parchilo: ${title}`);
+      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+    }
+
+    function shareLinkedIn() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+    }
+
+    // Toast popup helper
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      const text = document.getElementById('toastText');
+
+      text.innerText = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // HTML escape helper
+    function escapeHtml(string) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return String(string).replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    // Load blogs from database
+    async function loadBlogs() {
+      // 1. Try Supabase
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('blogs')
+            .select('*');
+
+          if (error) throw error;
+          
+          if (data && data.length > 0) {
+            blogPosts = {};
+            data.forEach(item => {
+              blogPosts[item.id] = {
+                title: item.title,
+                category: item.category,
+                date: item.date,
+                readTime: item.read_time,
+                author: item.author,
+                avatar: item.avatar,
+                avatarBg: item.avatar_bg,
+                avatarColor: item.avatar_color,
+                svg: item.svg,
+                body: item.body
+              };
+            });
+            loadArticle();
+            return;
+          }
+        } catch (err) {
+          console.warn("Supabase fetch failed, falling back to local storage:", err);
+        }
+      }
+
+      // 2. Fallback to LocalStorage
+      const stored = localStorage.getItem('parchilo_blogs');
+      let arrayData = [];
+      if (stored) {
+        arrayData = JSON.parse(stored);
+      } else {
+        // Map seedPosts into array format for localStorage initialization
+        arrayData = Object.keys(seedPosts).map(key => ({
+          id: key,
+          ...seedPosts[key]
+        }));
+        localStorage.setItem('parchilo_blogs', JSON.stringify(arrayData));
+      }
+
+      blogPosts = {};
+      arrayData.forEach(item => {
+        blogPosts[item.id] = {
+          title: item.title,
+          category: item.category,
+          date: item.date,
+          readTime: item.readTime || item.read_time,
+          author: item.author,
+          avatar: item.avatar,
+          avatarBg: item.avatarBg || item.avatar_bg,
+          avatarColor: item.avatarColor || item.avatar_color,
+          svg: item.svg,
+          body: item.body
+        };
+      });
+      loadArticle();
+    }
+
+    // Initial load
+    document.addEventListener("DOMContentLoaded", () => {
+      loadBlogs();
+    });
+
+    // Handle back/forward navigation within pages
+    window.addEventListener('popstate', () => {
+      loadArticle();
+    });
+  </script>
+</body>
+
+</html>
