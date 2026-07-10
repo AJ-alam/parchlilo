@@ -119,7 +119,6 @@ export default function InvoiceView() {
 
     fetchInvoice();
     
-    // Add hash change listener to reload if user clicks a different link
     const handleHashChange = () => {
       setLoading(true);
       fetchInvoice();
@@ -185,35 +184,35 @@ export default function InvoiceView() {
       </div>
 
       {/* A4 Sheet Container */}
-      <div className="invoice-a4-wrap" style={{ boxShadow: '0 20px 40px rgba(0,0,0,0.3)', borderRadius: '12px', background: 'var(--bg-card, #0d1527)', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-        <div className="invoice-a4" id="a4Content" style={{ padding: '40px', background: '#0e1726', color: '#e2e8f0' }}>
+      <div className="invoice-a4-wrap" style={{ boxShadow: '0 20px 40px rgba(0,0,0,0.15)', borderRadius: '12px', background: '#090d16', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', padding: '40px', display: 'flex', justifyContent: 'center' }}>
+        <div className="invoice-a4" id="a4Content" style={{ padding: '50px 40px', background: '#ffffff', color: '#1e293b', width: '100%', maxWidth: '700px', minHeight: '800px', boxSizing: 'border-box', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
           
           {/* Header */}
-          <div className="a4-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '24px', marginBottom: '24px' }}>
+          <div className="a4-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '24px', marginBottom: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               {invoice.logo ? (
                 <img src={invoice.logo} style={{ maxHeight: '55px', maxWidth: '150px', objectFit: 'contain' }} alt="Company Logo" />
               ) : (
                 <div>
-                  <div className="a4-logo" style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '1px' }}>PAR<span className="a4-logo-invert" style={{ color: 'var(--accent, #c8f135)' }}>CHI</span>LO</div>
-                  <p style={{ marginTop: '4px', fontWeight: 500, fontSize: '11px', color: 'var(--dim, #a0aec0)' }}>
+                  <div className="a4-logo" style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '0.5px', color: '#0f172a' }}>PAR<span className="a4-logo-invert" style={{ background: '#0f172a', color: '#ffffff', padding: '2px 6px', borderRadius: '4px', marginLeft: '2px' }}>CHI</span>LO</div>
+                  <p style={{ marginTop: '4px', fontWeight: 500, fontSize: '11px', color: '#64748b' }}>
                     Nexaura Technologies Partner
                   </p>
                 </div>
               )}
             </div>
             <div className="a4-meta-col" style={{ textAlign: 'right' }}>
-              <div className="a4-meta-title" style={{ fontSize: '28px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent, #c8f135)' }}>Invoice</div>
-              <p style={{ color: 'var(--dim, #a0aec0)', fontSize: '11px' }}>Processed & Verified</p>
+              <div className="a4-meta-title" style={{ fontSize: '28px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', color: '#0f172a' }}>Invoice</div>
+              <p style={{ color: '#64748b', fontSize: '11px' }}>Processed & Verified</p>
             </div>
           </div>
 
           {/* Billing Row */}
           <div className="a4-bill-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', gap: '20px' }}>
             <div className="a4-bill-col" style={{ flex: 1 }}>
-              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--accent, #c8f135)', marginBottom: '8px', letterSpacing: '0.5px' }}>Billed From</h5>
-              <strong>{invoice.from_company || 'Parchilo Services Ltd'}</strong>
-              <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--muted, #718096)', lineHeight: '1.5' }}>
+              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#2563eb', marginBottom: '8px', letterSpacing: '0.5px', fontWeight: 700 }}>Billed From</h5>
+              <strong style={{ color: '#0f172a', fontSize: '14px' }}>{invoice.from_company || 'Parchilo Services Ltd'}</strong>
+              <p style={{ marginTop: '6px', fontSize: '12px', color: '#475569', lineHeight: '1.5' }}>
                 {invoice.from_address ? (
                   invoice.from_address.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br /></React.Fragment>)
                 ) : (
@@ -224,9 +223,9 @@ export default function InvoiceView() {
               </p>
             </div>
             <div className="a4-bill-col" style={{ flex: 1 }}>
-              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--accent, #c8f135)', marginBottom: '8px', letterSpacing: '0.5px' }}>Billed To</h5>
-              <strong>{invoice.client_name}</strong>
-              <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--muted, #718096)', lineHeight: '1.5' }}>
+              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#2563eb', marginBottom: '8px', letterSpacing: '0.5px', fontWeight: 700 }}>Billed To</h5>
+              <strong style={{ color: '#0f172a', fontSize: '14px' }}>{invoice.client_name}</strong>
+              <p style={{ marginTop: '6px', fontSize: '12px', color: '#475569', lineHeight: '1.5' }}>
                 {invoice.client_email && <>{invoice.client_email}<br /></>}
                 {invoice.client_address ? (
                   invoice.client_address.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br /></React.Fragment>)
@@ -238,22 +237,22 @@ export default function InvoiceView() {
           </div>
 
           {/* Metadata Row */}
-          <div className="a4-bill-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '20px', marginBottom: '24px', gap: '20px' }}>
+          <div className="a4-bill-row" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '20px', marginBottom: '24px', gap: '20px' }}>
             <div className="a4-bill-col" style={{ flex: 1 }}>
-              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--accent, #c8f135)', marginBottom: '8px', letterSpacing: '0.5px' }}>Invoice Metadata</h5>
+              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#2563eb', marginBottom: '8px', letterSpacing: '0.5px', fontWeight: 700 }}>Invoice Metadata</h5>
               <div className="a4-meta-grid" style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '6px 12px', fontSize: '12px' }}>
-                <label style={{ color: 'var(--muted, #718096)' }}>Invoice Number:</label> <span>{invoice.invoice_number}</span>
-                <label style={{ color: 'var(--muted, #718096)' }}>Issue Date:</label> <span>{invoice.date}</span>
-                <label style={{ color: 'var(--muted, #718096)' }}>Payment Terms:</label> <span>Due on Receipt</span>
+                <label style={{ color: '#64748b' }}>Invoice Number:</label> <span style={{ color: '#0f172a', fontWeight: 600 }}>{invoice.invoice_number}</span>
+                <label style={{ color: '#64748b' }}>Issue Date:</label> <span style={{ color: '#0f172a' }}>{invoice.date}</span>
+                <label style={{ color: '#64748b' }}>Payment Terms:</label> <span style={{ color: '#0f172a' }}>Due on Receipt</span>
               </div>
             </div>
             <div className="a4-bill-col" style={{ flex: 1 }}>
-              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--accent, #c8f135)', marginBottom: '8px', letterSpacing: '0.5px' }}>Status</h5>
+              <h5 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#2563eb', marginBottom: '8px', letterSpacing: '0.5px', fontWeight: 700 }}>Status</h5>
               <span style={{ 
                 fontWeight: 900, 
                 textTransform: 'uppercase', 
                 fontSize: '15px', 
-                color: invoice.status === 'paid' ? 'var(--green, #10b981)' : 'var(--amber, #f59e0b)' 
+                color: invoice.status === 'paid' ? '#10b981' : '#f59e0b' 
               }}>
                 {invoice.status}
               </span>
@@ -263,22 +262,22 @@ export default function InvoiceView() {
           {/* Items Table */}
           <table className="a4-table" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '13px' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                <th style={{ width: '50%', padding: '12px 0', textAlign: 'left', color: 'var(--muted, #718096)' }}>Description</th>
-                <th style={{ width: '10%', padding: '12px 0', textAlign: 'right', color: 'var(--muted, #718096)' }}>Qty</th>
-                <th style={{ width: '20%', padding: '12px 0', textAlign: 'right', color: 'var(--muted, #718096)' }}>Unit Price</th>
-                <th style={{ width: '20%', padding: '12px 0', textAlign: 'right', color: 'var(--muted, #718096)' }}>Amount</th>
+              <tr style={{ borderBottom: '2px solid #0f172a' }}>
+                <th style={{ width: '50%', padding: '12px 0', textAlign: 'left', color: '#475569', fontWeight: 600 }}>Description</th>
+                <th style={{ width: '10%', padding: '12px 0', textAlign: 'right', color: '#475569', fontWeight: 600 }}>Qty</th>
+                <th style={{ width: '20%', padding: '12px 0', textAlign: 'right', color: '#475569', fontWeight: 600 }}>Unit Price</th>
+                <th style={{ width: '20%', padding: '12px 0', textAlign: 'right', color: '#475569', fontWeight: 600 }}>Amount</th>
               </tr>
             </thead>
             <tbody>
               {invoice.items.map((item, i) => {
                 const itemSub = Number(item.qty || 0) * Number(item.price || 0);
                 return (
-                  <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <td style={{ padding: '12px 0', textAlign: 'left' }}>{item.name}</td>
-                    <td style={{ padding: '12px 0', textAlign: 'right' }}>{item.qty}</td>
-                    <td style={{ padding: '12px 0', textAlign: 'right' }}>{formatCurrencyValue(Number(item.price || 0), currencyVal)}</td>
-                    <td style={{ padding: '12px 0', textAlign: 'right', fontWeight: 700 }}>
+                  <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <td style={{ padding: '12px 0', textAlign: 'left', color: '#0f172a' }}>{item.name}</td>
+                    <td style={{ padding: '12px 0', textAlign: 'right', color: '#0f172a' }}>{item.qty}</td>
+                    <td style={{ padding: '12px 0', textAlign: 'right', color: '#0f172a' }}>{formatCurrencyValue(Number(item.price || 0), currencyVal)}</td>
+                    <td style={{ padding: '12px 0', textAlign: 'right', fontWeight: 700, color: '#0f172a' }}>
                       {formatCurrencyValue(itemSub, currencyVal)}
                     </td>
                   </tr>
@@ -295,28 +294,28 @@ export default function InvoiceView() {
             gap: '8px 16px', 
             fontSize: '13px', 
             textAlign: 'right',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            borderBottom: '2px solid #0f172a',
             paddingBottom: '16px',
             marginBottom: '24px'
           }}>
-            <label style={{ color: 'var(--muted, #718096)' }}>Subtotal:</label> <span>{formatCurrencyValue(itemSubtotal, currencyVal)}</span>
-            <label style={{ color: 'var(--muted, #718096)' }}>Tax Rate ({taxVal}%):</label> <span>{formatCurrencyValue(itemTax, currencyVal)}</span>
-            <label className="grand-total-label" style={{ fontWeight: 900, fontSize: '15px', color: 'var(--accent, #c8f135)' }}>Grand Total:</label> 
-            <span className="grand-total-val" style={{ fontWeight: 900, fontSize: '15px', color: 'var(--accent, #c8f135)' }}>{formatCurrencyValue(itemTotal, currencyVal)}</span>
+            <label style={{ color: '#475569' }}>Subtotal:</label> <span style={{ color: '#0f172a', fontWeight: 600 }}>{formatCurrencyValue(itemSubtotal, currencyVal)}</span>
+            <label style={{ color: '#475569' }}>Tax Rate ({taxVal}%):</label> <span style={{ color: '#0f172a' }}>{formatCurrencyValue(itemTax, currencyVal)}</span>
+            <label className="grand-total-label" style={{ fontWeight: 900, fontSize: '16px', color: '#0f172a' }}>Grand Total:</label> 
+            <span className="grand-total-val" style={{ fontWeight: 900, fontSize: '16px', color: '#0f172a' }}>{formatCurrencyValue(itemTotal, currencyVal)}</span>
           </div>
 
           {/* Stamp Display */}
           {invoice.stamp && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '10px', marginRight: '20px' }}>
-              <p style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--dim, #a0aec0)', marginBottom: '4px' }}>Authorized Stamp</p>
+              <p style={{ fontSize: '9px', textTransform: 'uppercase', color: '#475569', marginBottom: '4px', fontWeight: 600 }}>Authorized Stamp</p>
               <img src={invoice.stamp} style={{ maxHeight: '75px', maxWidth: '120px', objectFit: 'contain' }} alt="Company Stamp" />
             </div>
           )}
 
           {/* Footer */}
-          <div className="a4-footer" style={{ textAlign: 'center', marginTop: '40px', fontSize: '11px', color: 'var(--muted, #718096)' }}>
+          <div className="a4-footer" style={{ textAlign: 'center', marginTop: '40px', fontSize: '11px', color: '#64748b' }}>
             <p>Thank you for your business. For invoice questions, please contact billing@parchilo.com</p>
-            <p style={{ marginTop: '6px', fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>
+            <p style={{ marginTop: '6px', fontSize: '9px', color: '#94a3b8' }}>
               Generated by Parchilo Invoice System. Secure client-side local cache.
             </p>
           </div>
@@ -345,6 +344,7 @@ export default function InvoiceView() {
             border: none !important;
             background: #ffffff !important;
             border-radius: 0 !important;
+            padding: 0 !important;
           }
           .invoice-a4, .invoice-a4 * {
             visibility: visible;
@@ -353,6 +353,7 @@ export default function InvoiceView() {
           }
           .invoice-a4 {
             padding: 0 !important;
+            border: none !important;
           }
           .a4-logo-invert, .a4-meta-title, .grand-total-label, .grand-total-val {
             color: #000000 !important;
