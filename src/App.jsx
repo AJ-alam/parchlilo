@@ -9,6 +9,7 @@ import Admin from './pages/Admin';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import InvoiceView from './pages/InvoiceView';
 
 import './styles/Global.css';
 
@@ -21,6 +22,7 @@ export default function App() {
           <Routes>
             {/* Standard Routes */}
             <Route path="/" element={<Home />} />
+            <Route path="/invoice/:id" element={<InvoiceView />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blog-post" element={<BlogPost />} />
             <Route path="/admin" element={<Admin />} />

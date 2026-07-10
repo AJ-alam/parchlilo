@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python / Flask / Databases
+backend/instance/
+backend/uploads/
+backend/backend_log.txt
+backend/.env
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+
