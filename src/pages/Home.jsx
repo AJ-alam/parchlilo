@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { UploadCloud, CheckCircle, Printer, X, Search, Trash2, Plus, Eye, Loader, HelpCircle } from 'lucide-react';
+import { createWorker } from 'tesseract.js';
 import '../styles/Home.css';
 
 // Encode UTF-8 string to Base64 safely
@@ -7,6 +8,182 @@ function safeBtoa(str) {
   return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
     return String.fromCharCode(parseInt(p1, 16));
   }));
+}
+
+// Heuristics-based text parsing engine for OCR output
+function parseInvoiceText(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  
+  let invoice_number = '';
+  let client_name = '';
+  let client_email = '';
+  let client_address = '';
+  let date = new Date().toISOString().split('T')[0];
+  let items = [];
+  let currency = 'PKR';
+  let tax_rate = 17;
+
+  // 1. Parse Invoice Number
+  const invNumRegex = /(?:invoice|inv|bill)(?:\s+number|\s+no|\s*#)?[:\s-]*([a-z0-9\-_#]{3,})/i;
+  for (const line of lines) {
+    const match = line.match(invNumRegex);
+    if (match && match[1]) {
+      const val = match[1].trim();
+      if (val.length >= 3 && !/^(number|no|date|to)$/i.test(val)) {
+        invoice_number = val;
+        break;
+      }
+    }
+  }
+
+  // 2. Parse Date
+  const dateRegex = /(\d{4}[-/.]\d{2}[-/.]\d{2})|(\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4})|(\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})/;
+  for (const line of lines) {
+    const match = line.match(dateRegex);
+    if (match) {
+      let dateVal = match[0].trim();
+      try {
+        const d = new Date(dateVal.replace(/-/g, '/'));
+        if (!isNaN(d.getTime())) {
+          date = d.toISOString().split('T')[0];
+          break;
+        }
+      } catch(e) {}
+    }
+  }
+
+  // 3. Parse Email
+  const emailRegex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/;
+  for (const line of lines) {
+    const match = line.match(emailRegex);
+    if (match) {
+      client_email = match[1].trim();
+      break;
+    }
+  }
+
+  // 4. Parse Client Name & Address
+  let billToIdx = -1;
+  const billToKeywords = /(?:bill\s+to|billed\s+to|invoice\s+to|client|to:)/i;
+  for (let i = 0; i < lines.length; i++) {
+    if (billToKeywords.test(lines[i])) {
+      if (!/from|sender/i.test(lines[i])) {
+        billToIdx = i;
+        break;
+      }
+    }
+  }
+
+  if (billToIdx !== -1) {
+    const colonParts = lines[billToIdx].split(/[:\-]/);
+    if (colonParts.length > 1 && colonParts[1].trim().length > 3) {
+      client_name = colonParts[1].trim();
+      const addrLines = [];
+      for (let k = 1; k <= 3; k++) {
+        const nextLine = lines[billToIdx + k];
+        if (nextLine && nextLine.trim().length > 2 && !billToKeywords.test(nextLine) && !emailRegex.test(nextLine) && !/date|invoice|total|items/i.test(nextLine)) {
+          addrLines.push(nextLine.trim());
+        }
+      }
+      client_address = addrLines.join(', ');
+    } else {
+      const clientLines = [];
+      for (let k = 1; k <= 4; k++) {
+        const nextLine = lines[billToIdx + k];
+        if (nextLine && nextLine.trim().length > 2 && !billToKeywords.test(nextLine) && !emailRegex.test(nextLine) && !/date|invoice|total|items/i.test(nextLine)) {
+          clientLines.push(nextLine.trim());
+        }
+      }
+      if (clientLines.length > 0) {
+        client_name = clientLines[0];
+        client_address = clientLines.slice(1).join(', ');
+      }
+    }
+  }
+
+  // 5. Parse Currency
+  if (text.includes('$') || text.toLowerCase().includes('usd')) {
+    currency = 'USD';
+  } else if (text.includes('€') || text.toLowerCase().includes('eur')) {
+    currency = 'EUR';
+  } else if (text.includes('£') || text.toLowerCase().includes('gbp')) {
+    currency = 'GBP';
+  } else if (text.includes('₨') || text.includes('Rs') || text.toLowerCase().includes('pkr')) {
+    currency = 'PKR';
+  } else if (text.includes('₹') || text.toLowerCase().includes('inr')) {
+    currency = 'INR';
+  }
+
+  // 6. Parse Line Items
+  for (const line of lines) {
+    if (/invoice|date|gst|ntn|total|subtotal|tax|email|phone|address|bill|to|from|payment|terms|verified|partner/i.test(line)) {
+      continue;
+    }
+
+    const numbers = line.match(/\d+[\d,.]*/g);
+    if (numbers && numbers.length >= 2) {
+      const cleanNums = numbers.map(n => n.replace(/,/g, '')).map(Number).filter(n => !isNaN(n));
+      if (cleanNums.length >= 2) {
+        const sorted = [...cleanNums].sort((a, b) => a - b);
+        let qty = 1;
+        let price = 0;
+        
+        if (sorted[0] < 100 && sorted[1] >= 100) {
+          qty = sorted[0];
+          price = sorted[1];
+        } else if (sorted.length >= 3) {
+          const tolerance = 5;
+          const product = sorted[0] * sorted[1];
+          if (Math.abs(product - sorted[2]) <= tolerance) {
+            qty = sorted[0];
+            price = sorted[1];
+          } else {
+            qty = sorted[0];
+            price = sorted[1];
+          }
+        } else {
+          price = sorted[1];
+          qty = sorted[0] || 1;
+        }
+
+        let desc = line;
+        for (const num of numbers) {
+          desc = desc.replace(num, '');
+        }
+        desc = desc.replace(/[₨$€£₹\-\s:,]+/g, ' ').trim();
+
+        if (desc.length > 3 && price > 0) {
+          items.push({
+            name: desc,
+            qty: qty,
+            price: price
+          });
+        }
+      }
+    }
+  }
+
+  // Defaults if matches failed
+  if (!invoice_number) {
+    invoice_number = "INV-2026-" + Math.floor(100 + Math.random() * 900);
+  }
+  if (!client_name) {
+    client_name = "Extracted Billed Client";
+  }
+  if (items.length === 0) {
+    items = [{ name: 'Parsed Invoice Service / Product', qty: 1, price: 5000 }];
+  }
+
+  return {
+    invoice_number,
+    client_name,
+    client_email,
+    client_address,
+    date,
+    currency,
+    tax_rate,
+    items
+  };
 }
 
 // Complete world currencies list
@@ -46,9 +223,6 @@ const currenciesList = [
   { code: 'OMR', symbol: 'ر.ع', name: 'OMR - Omani Rial', decimals: 3 },
   { code: 'BHD', symbol: 'د.ب', name: 'BHD - Bahraini Dinar', decimals: 3 }
 ];
-
-// Prepopulate database with mock data if empty
-const mockInvoices = [];
 
 export default function Home() {
   // App settings & view tabs
@@ -113,79 +287,71 @@ export default function Home() {
     }, 3000);
   };
 
-  // Drag and Drop Parsing Simulation
+  // Drag and Drop Parsing OCR
   const handleFileDrop = (e) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      simulateParsing(files[0].name);
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        performOCR(file);
+      } else {
+        triggerToast("Please upload an image file (PNG, JPEG, WebP) for OCR parsing.");
+      }
     }
   };
 
   const handleFileSelect = (e) => {
     const files = e.target.files;
     if (files.length > 0) {
-      simulateParsing(files[0].name);
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        performOCR(file);
+      } else {
+        triggerToast("Please upload an image file (PNG, JPEG, WebP) for OCR parsing.");
+      }
     }
   };
 
-  const simulateParsing = (fileName) => {
+  const performOCR = async (file) => {
     setParsing(true);
-    setParserStep(1);
+    setParserStep(1); // Reading layout...
 
-    // Step 1: Layout reading
-    setTimeout(() => {
-      setParserStep(2);
-    }, 1000);
-
-    // Step 2: Org details
-    setTimeout(() => {
-      setParserStep(3);
-    }, 2000);
-
-    // Step 3: Item mapping
-    setTimeout(() => {
-      setParserStep(4);
-    }, 3000);
-
-    // Step 4: Finished simulation & fill manual builder
-    setTimeout(() => {
-      let extClient = "UET Lahore Campus";
-      let extEmail = "procurement@uet.edu.pk";
-      let extAddress = "GT Road, Lahore, Pakistan";
-      let extInvNum = "INV-2026-" + Math.floor(100 + Math.random() * 900);
-      let extItems = [
-        { name: "Vite 5 Development Hosting Server License", qty: 2, price: 45000 },
-        { name: "FBR GST Consultancy Service fee", qty: 1, price: 15000 }
-      ];
-
-      if (fileName.toLowerCase().includes('scanned') || fileName.toLowerCase().includes('pdf')) {
-        extClient = "Standard Chartered Pakistan";
-        extEmail = "finance@sc.com.pk";
-        extAddress = "SC Tower, I.I. Chundrigar Road, Karachi";
-        extItems = [
-          { name: "Commercial Office Paper Packs A4", qty: 10, price: 1800 },
-          { name: "Premium Network Router Linksys v2", qty: 1, price: 89000 },
-          { name: "Installation & setup services", qty: 1, price: 12000 }
-        ];
-      }
-
-      // Populate builder state with extracted values
-      setClientName(extClient);
-      setClientEmail(extEmail);
-      setClientAddress(extAddress);
-      setInvoiceNumber(extInvNum);
-      setItems(extItems);
-      setTaxRate(17);
-      setCurrency("PKR");
-
+    try {
+      const worker = await createWorker('eng');
+      setParserStep(2); // Extracting client and org fields...
+      
+      const ret = await worker.recognize(file);
+      setParserStep(3); // Mapping line item tables...
+      
+      const text = ret.data.text;
+      await worker.terminate();
+      
+      setParserStep(4); // Formatting values...
+      
+      const result = parseInvoiceText(text);
+      
+      // Seed manual builder state with parsed contents
+      setClientName(result.client_name);
+      setClientEmail(result.client_email);
+      setClientAddress(result.client_address);
+      setInvoiceNumber(result.invoice_number);
+      setItems(result.items);
+      setTaxRate(result.tax_rate);
+      setCurrency(result.currency);
+      
       // Swap view to Builder so they can verify/save
       setActiveTab('builder');
       setParsing(false);
       setParserStep(0);
 
       triggerToast("AI extracted invoice data! Please review and modify before generating.");
-    }, 4200);
+    } catch (err) {
+      console.error("OCR extraction failed:", err);
+      setParsing(false);
+      setParserStep(0);
+      triggerToast("OCR extraction failed. Please manually fill the form.");
+    }
   };
 
   // --- COMPRESS & UPLOAD BRANDING IMAGES ---
@@ -358,20 +524,20 @@ export default function Home() {
                 <div className="parsing-loader" style={{ display: 'flex' }}>
                   <div className="loader-title">
                     <div className="spinner"></div>
-                    AI Parser Simulation Running...
+                    AI Parser OCR Running...
                   </div>
                   <div className="parsing-steps">
                     <div className={`parsing-step ${parserStep === 1 ? 'active' : parserStep > 1 ? 'done' : ''}`}>
                       {parserStep === 1 ? <Loader className="spinner" size={14} /> : parserStep > 1 ? <CheckCircle size={14} /> : <div style={{width: 14, height: 14, borderRadius: '50%', border: '1px solid #718096'}} />}
-                      <span>Reading document layout...</span>
+                      <span>Initializing local OCR engine...</span>
                     </div>
                     <div className={`parsing-step ${parserStep === 2 ? 'active' : parserStep > 2 ? 'done' : ''}`}>
                       {parserStep === 2 ? <Loader className="spinner" size={14} /> : parserStep > 2 ? <CheckCircle size={14} /> : <div style={{width: 14, height: 14, borderRadius: '50%', border: '1px solid #718096'}} />}
-                      <span>Extracting client and org fields...</span>
+                      <span>Running character recognition...</span>
                     </div>
                     <div className={`parsing-step ${parserStep === 3 ? 'active' : parserStep > 3 ? 'done' : ''}`}>
                       {parserStep === 3 ? <Loader className="spinner" size={14} /> : parserStep > 3 ? <CheckCircle size={14} /> : <div style={{width: 14, height: 14, borderRadius: '50%', border: '1px solid #718096'}} />}
-                      <span>Mapping line item tables...</span>
+                      <span>Mapping line items and totals...</span>
                     </div>
                     <div className={`parsing-step ${parserStep === 4 ? 'active' : parserStep > 4 ? 'done' : ''}`}>
                       {parserStep === 4 ? <Loader className="spinner" size={14} /> : parserStep > 4 ? <CheckCircle size={14} /> : <div style={{width: 14, height: 14, borderRadius: '50%', border: '1px solid #718096'}} />}
@@ -399,13 +565,13 @@ export default function Home() {
                     <UploadCloud size={24} />
                   </div>
                   <div className="dz-title">Click or drag file here</div>
-                  <div className="dz-desc">PDF, PNG, JPEG, or WebP</div>
+                  <div className="dz-desc">PNG, JPEG, WebP</div>
                   <div className="dz-subtext">File items will be parsed into invoices dynamically</div>
                   <input 
                     type="file" 
                     ref={fileInputRef}
                     style={{ display: 'none' }} 
-                    accept=".pdf, image/*"
+                    accept="image/*"
                     onChange={handleFileSelect}
                   />
                 </div>
